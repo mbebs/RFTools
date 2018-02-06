@@ -9,15 +9,15 @@
 [general]
 name=RF Tools
 qgisMinimumVersion=2.0
-description=Simple Tools for the RF Engineer
+description=QGIS plugin tools for RF and Wireless Telecommunication Engineers
 version=0.1
 author=Leonard Fodje
 email=mbebs@live.com
 
-about=RF Tools are a collection of simple tools to aid the RF Telecom engineer
+about=RFTools is a QGIS plugin containing a series of tools useful for RF and Wireless Telecommunication Engineers.
 
-tracker=https://bitbucket.org/lmfodje/rftools
-repository=https://bitbucket.org/lmfodje/rftools
+tracker=https://github.com/mbebs/RFTools
+repository=https://github.com/mbebs/RFTools
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=https://bitbucket.org/lmfodje/rftools
 # Tags are comma separated with spaces allowed
 tags=RF, Tools, Engineer, Telecom, Wireless, LTE
 
-homepage=https://bitbucket.org/lmfodje/rftools
+homepage=https://github.com/mbebs/RFTools
 category=Plugins
 icon=icon.png
 # experimental flag

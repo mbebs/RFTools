@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RFToolsDialogBase</class>
- <widget class="QDialog" name="RFToolsDialogBase">
+ <class>siteSeeDialog</class>
+ <widget class="QDialog" name="siteSeeDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>403</width>
-    <height>426</height>
+    <height>462</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>SiteSee</string>
   </property>
-  <widget class="QDialogButtonBox" name="button_box">
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>390</y>
+     <y>400</y>
      <width>171</width>
-     <height>21</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
@@ -39,7 +51,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Inputs</string>
+    <string>Input</string>
    </property>
    <widget class="QLabel" name="beamWidth_label">
     <property name="geometry">
@@ -47,19 +59,19 @@
       <x>10</x>
       <y>110</y>
       <width>101</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>BeamWidth Column :</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="beamWidth_ComboBox">
+   <widget class="QComboBox" name="beamwidthComboBox">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>150</x>
       <y>110</y>
-      <width>241</width>
+      <width>211</width>
       <height>22</height>
      </rect>
     </property>
@@ -67,46 +79,23 @@
    <widget class="QLabel" name="beamWidth_label2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>150</x>
       <y>150</y>
       <width>161</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>OR enter BeamWidth (Degrees ) :</string>
+     <string>Default BeamWidth (Deg) :</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="beamWidth_edit">
+   <widget class="QComboBox" name="azimuthComboBox">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>150</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="placeholderText">
-     <string>65</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="selectLayerComboBox">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>30</y>
-      <width>241</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="azimuth_Combo_Box">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
+      <x>150</x>
       <y>70</y>
-      <width>241</width>
-      <height>22</height>
+      <width>211</width>
+      <height>21</height>
      </rect>
     </property>
    </widget>
@@ -116,7 +105,7 @@
       <x>10</x>
       <y>70</y>
       <width>91</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -129,7 +118,7 @@
       <x>10</x>
       <y>30</y>
       <width>101</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -140,21 +129,21 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
+      <y>190</y>
       <width>101</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Sector Size Column :</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="sectorSize_ComboBox">
+   <widget class="QComboBox" name="sectorsizeComboBox">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>180</y>
-      <width>241</width>
+      <x>150</x>
+      <y>190</y>
+      <width>211</width>
       <height>22</height>
      </rect>
     </property>
@@ -162,40 +151,65 @@
    <widget class="QLabel" name="sectorSize_label2">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>220</y>
+      <x>150</x>
+      <y>230</y>
       <width>151</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>OR enter Sector Size (Miiles) :</string>
+     <string>Default Sector Size (Miiles) :</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="sectorSize_edit">
+   <widget class="QgsMapLayerComboBox" name="selectLayerComboBox">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>220</y>
-      <width>71</width>
-      <height>20</height>
+      <x>150</x>
+      <y>26</y>
+      <width>211</width>
+      <height>21</height>
      </rect>
-    </property>
-    <property name="placeholderText">
-     <string>2</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QDoubleSpinBox" name="defaultsectorSize">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>250</y>
-      <width>171</width>
-      <height>17</height>
+      <x>310</x>
+      <y>230</y>
+      <width>51</width>
+      <height>22</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Automatic Sector Coloring</string>
+    <property name="maximum">
+     <double>9.990000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.050000000000000</double>
+    </property>
+    <property name="value">
+     <double>0.350000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="defaultbeamWidth">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>150</y>
+      <width>51</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <double>90.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>1.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>65.000000000000000</double>
     </property>
    </widget>
   </widget>
@@ -203,13 +217,13 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>300</y>
+     <y>310</y>
      <width>381</width>
-     <height>81</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="title">
-    <string>Outputs</string>
+    <string>Output</string>
    </property>
    <widget class="QLabel" name="newLayer_label">
     <property name="geometry">
@@ -224,14 +238,20 @@
      <string>New Layer Name :</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="newLayerName_edit">
+   <widget class="QLineEdit" name="layerNameLineEdit">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>150</x>
       <y>30</y>
-      <width>241</width>
+      <width>211</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>SiteSee Layer</string>
+    </property>
+    <property name="placeholderText">
+     <string/>
     </property>
    </widget>
   </widget>
@@ -239,8 +259,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>390</y>
-     <width>201</width>
+     <y>410</y>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -249,16 +269,23 @@
    </property>
   </widget>
   <zorder>groupBox</zorder>
-  <zorder>button_box</zorder>
+  <zorder>buttonBox</zorder>
   <zorder>groupBox_2</zorder>
   <zorder>progressBar</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgis.gui</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>button_box</sender>
+   <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>RFToolsDialogBase</receiver>
+   <receiver>siteSeeDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -272,9 +299,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>button_box</sender>
+   <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>RFToolsDialogBase</receiver>
+   <receiver>siteSeeDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
