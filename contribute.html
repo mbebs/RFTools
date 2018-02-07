@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>RF Tools - A QGIS Plugin</title>
+	<meta name='Generator' content='RFTools v0.91'>
+	<link rel="icon" href="/favicon.ico">
+<!--
+	<link rel="stylesheet" type="text/css" href="/zim.css">
+-->
+	<meta name="keywords" content="RF, Wireless, Telecom, Cellular, Sites, Engineer">
+	<meta name="description" content="RF Tools a QGIS plugin for RF and Wireless Telecom Engineers">
+	<meta name="author" content="mbebs@live.com">
+	<meta name="robots" content="ALL">
+	<meta name="revisit" content="15 days">
+	<![if !IE]>
+	<!-- comment out for IE since it spams the user with warnings -->
+	<script type='text/javascript' src='http://code.jquery.com/jquery-1.7.1.js'></script>
+	<script type='text/javascript'>
+		$(window).load(function(){$("#navigation").height( $("#content").height()+65 );});
+	</script>
+	<![endif]>
+	<style>
+		body, html {
+			height:100%;
+			font-family:'Open Sans', sans-serif;
+			line-height:1.5em;
+			background-color:#FAFAFA;
+			text-rendering:geometricPrecision;
+			margin:0;
+			padding:0;
+		}
+		#wrapper {
+			height:100%;
+			position:relative;
+		}
+		#navigation {
+			background-color:#F3F3F3;
+			display:inline-block;
+			border-right:1px solid #EAEAEA;
+			padding-top:10px;
+			padding-right:20px;
+			padding-left:20px;
+			position:relative;
+			float:left;
+			min-height:100%;
+		}
+		#content {
+			float:left;
+			display:inline-block;
+			position:absolute;
+			max-width:960px;
+			padding-top:10px;
+			padding-right:65px;
+			padding-left:65px;
+			padding-bottom:65px;
+		}
+		#logo {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		a {
+			text-decoration: none;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+		a:active {
+			text-decoration: underline;
+		}
+
+		#navigation li {
+			list-style-type:none;
+		}
+		#navigation a {
+			color: #555;
+			font-weight: 500;
+		}
+
+		#content h1,h2,h3,h4,h5,h6 {
+			color: #4E9A06;
+			margin-bottom: 0;
+			font-weight: normal;
+		}
+		#content p {
+			margin-top: 0;
+		}
+		#content a {
+			color: #CE5C00;
+		}
+		#content strike {
+			color: grey;
+		}
+		#content u {
+			text-decoration: none;
+			background-color: yellow;
+		}
+		#content tt {
+			color: #2e3436;
+		}
+		#content pre {
+			color: #2e3436;
+			margin-left: 20px;
+		}
+
+		.checked-box {list-style-image: url()}
+		.xchecked-box {list-style-image: url()}
+		.unchecked-box {list-style-image: url()}
+		ul {list-style-image: none}
+		/* ul rule needed to reset style for sub-bullets */
+
+		span.zim-tag {
+			color: #ce5c00;
+		}
+		div.zim-object {
+			border-style:solid;
+			border-width:1px;
+		}
+
+		p.footer {
+			padding-top: 45;
+			text-align: left;
+			color: gray;
+		}
+	</style>
+
+</head>
+<body>
+
+<div id="wrapper">
+
+<div id="navigation">
+
+<div id="logo">
+<a href="index.html"><img src="doc/logo.png" alt="RFTools logo" border="0"></a>
+</div>
+
+<ul>
+	<li><a href="index.html">Home</a></li>
+		<li><a href="contribute.html">Contribute</a></li>
+</ul>
+</div> <!-- /navigation -->
+
+<div id="content">
+
+<h1 class="header">RF Tools - A QGIS Plugin</h1>
+<br>
+
+<h1>Contribute</h1>
+
+<br>
+
+<h2>Donations</h2>
+<br>
+<p>
+RF Tools is a completely free software, free as in open source <i>and</i> free as in free beer ;-). <br> However if you feel like stimulating further development of RFTools, you can make a donation using the paypal button below.
+</p>
+
+<p>
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+	<input type="hidden" name="cmd" value="_s-xclick">
+	<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+	">
+	<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+	<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+	</form>
+
+<p></p>
+
+<p>
+In the paypal "Comments" box, please feel free to tell me what is on your wish list for future development. I can not promise to implement every feature that gets mentioned in a donation, but it will certainly be taken into consideration. If enough funds come in we will set up bounties for other developers that want to work on nominated features as well.
+</p>
+
+<h2>Development planning</h2>
+
+<p>
+The development planning is more or less managed using the <a href="https://github.com/mbebs/RFTools/issues" title="bug tracker" class="https">bug tracker</a>
+</p>
+
+<h2>Patches</h2>
+
+<p>
+Please see our <a href="https://github.com/mbebs/RFTools" title="GitHub repository" class="https">GitHub repository</a> for the latest developement code. To submit patches please create your own branch and once done file a merge request.
+</p>
+<br>
+<hr>
+
+<p class="footer">
+	<i>&copy; 2018 Leonard Fodje [mbebs@live.com]</i>
+</p>
+
+</div> <!-- /content -->
+
+</div> <!-- /wrapper -->
+
+
+
+</body></html>

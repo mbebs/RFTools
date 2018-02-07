@@ -1,0 +1,211 @@
+﻿
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>RF Tools - A QGIS Plugin</title>
+	<meta name='Generator' content='RFTools v0.91'>
+	<link rel="icon" href="/favicon.ico">
+<!--
+	<link rel="stylesheet" type="text/css" href="/zim.css">
+-->
+	<meta name="keywords" content="RF, Wireless, Telecom, Cellular, Sites, Engineer">
+	<meta name="description" content="RF Tools a QGIS plugin for RF and Wireless Telecom Engineers">
+	<meta name="author" content="mbebs@live.com">
+	<meta name="robots" content="ALL">
+	<meta name="revisit" content="15 days">
+	<![if !IE]>
+	<!-- comment out for IE since it spams the user with warnings -->
+	<script type='text/javascript' src='http://code.jquery.com/jquery-1.7.1.js'></script>
+	<script type='text/javascript'>
+		$(window).load(function(){$("#navigation").height( $("#content").height()+65 );});
+	</script>
+	<![endif]>
+	<style>
+		body, html {
+			height:100%;
+			font-family:'Open Sans', sans-serif;
+			line-height:1.5em;
+			background-color:#FAFAFA;
+			text-rendering:geometricPrecision;
+			margin:0;
+			padding:0;
+		}
+		#wrapper {
+			height:100%;
+			position:relative;
+		}
+		#navigation {
+			background-color:#F3F3F3;
+			display:inline-block;
+			border-right:1px solid #EAEAEA;
+			padding-top:10px;
+			padding-right:20px;
+			padding-left:20px;
+			position:relative;
+			float:left;
+			min-height:100%;
+		}
+		#content {
+			float:left;
+			display:inline-block;
+			position:absolute;
+			max-width:960px;
+			padding-top:10px;
+			padding-right:65px;
+			padding-left:65px;
+			padding-bottom:65px;
+		}
+		#logo {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		a {
+			text-decoration: none;
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+		a:active {
+			text-decoration: underline;
+		}
+
+		#navigation li {
+			list-style-type:none;
+		}
+		#navigation a {
+			color: #555;
+			font-weight: 500;
+		}
+
+		#content h1,h2,h3,h4,h5,h6 {
+			color: #4E9A06;
+			margin-bottom: 0;
+			font-weight: normal;
+		}
+		#content p {
+			margin-top: 0;
+		}
+		#content a {
+			color: #CE5C00;
+		}
+		#content strike {
+			color: grey;
+		}
+		#content u {
+			text-decoration: none;
+			background-color: yellow;
+		}
+		#content tt {
+			color: #2e3436;
+		}
+		#content pre {
+			color: #2e3436;
+			margin-left: 20px;
+		}
+
+		.checked-box {list-style-image: url()}
+		.xchecked-box {list-style-image: url()}
+		.unchecked-box {list-style-image: url()}
+		ul {list-style-image: none}
+		/* ul rule needed to reset style for sub-bullets */
+
+		span.zim-tag {
+			color: #ce5c00;
+		}
+		div.zim-object {
+			border-style:solid;
+			border-width:1px;
+		}
+
+		p.footer {
+			padding-top: 45;
+			text-align: left;
+			color: gray;
+		}
+	</style>
+
+</head>
+<body>
+
+<div id="wrapper">
+
+<div id="navigation">
+<div id="logo">
+<a href="index.html"><img src="doc/logo.png" alt="RFTools logo" border="0"></a>
+</div>
+
+<ul>
+	<li><a href="index.html">Home</a></li>
+	<li><a href="contribute.html">Contribute</a></li>
+</ul>
+</div> <!-- /navigation -->
+
+<div id="content">
+
+<h1 class="header">RF Tools - A QGIS Plugin</h1>
+<br>
+
+
+<h1>Home</h1>
+
+<br>
+
+<p>
+<b>RF Tools </b> is a QGIS python plugin containing a series of tools useful for Radio Frequency and Wireless Telecommunication Engineers in visualizing, planning, deployment and optimization of cellular networks.
+</p>
+
+<p>
+<b>RF Tools</b> RoadMap:<br>
+<ul>
+<li><b>SiteSee -</b> Visualization of cell sites and sector azimuths. <i>[Release Date : 02/28/2018]</i></li>
+<li><b>PCI/RSI Planner -</b> Tool to aid in planning and assigning PCI and RSI to cells in an LTE Network <i>[Release Date : 07/28/2018]</i></li>
+<li><b>Candidate Evaluator -</b> Tool to automatically evaluate and select the best candidate in a search ring based on provided criteria. <i>[Release Date : 09/28/2018]</i></li>
+</ul>
+</p>
+
+<p>
+<b>SiteSee</b> creates sector, azimuth and antenna beamwidth visualization of your cellular network. The output shape layer can be easily customized and contains all fields on the input file.
+</p>
+<p>
+
+<h2>SiteSee </b>: Input CSV file header as a vector layer</h2><br>
+
+
+<img src="doc/sitesee_header.png">
+</p>
+
+<p>
+Import a csv file as a vector layer with coordinates, azimuth, antenna beamwidth(optional) and sector size(optional). SiteSee assumes an azimuth of 360 degrees (omni) if no azimuth or invalid azimuth is provided.
+</p>
+
+<h2>SiteSee </b>:QGIS python GUI</h2><br>
+
+
+<img src="doc/sitesee.png">
+</p>
+
+<p>
+	<ul>
+		<li>1. Select Vector Layer to process</li>
+		<li>2. Select column containing azimuth(bearing). Default: 360</li>
+		<li>3. Select column containing antenna beamwidth or enter a default value to use for all cells</li>
+		<li>4. Select column containing sector size or enter a default value to use for all cells.</li>
+		<li>5. Enter output layer name and hit ok to process.</li>
+	</ul>
+</p>
+<br>
+<hr>
+
+<p class="footer">
+	<i>&copy; 2018 Leonard Fodje [mbebs@live.com]</i>
+</p>
+
+</div> <!-- /content -->
+
+</div> <!-- /wrapper -->
+
+</body>
+</html>
