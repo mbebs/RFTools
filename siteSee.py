@@ -1,14 +1,17 @@
 import os
 import re
+import math
 from geographiclib.geodesic import Geodesic
 
 from qgis.core import (QgsFeature,
-    QgsCoordinateTransform, QgsVectorLayer, QgsPoint, QgsFeature,
-    QgsGeometry, QgsMapLayerRegistry, QGis, QgsCoordinateReferenceSystem)
-from qgis.gui import QgsMessageBar, QgsMapLayerProxyModel
+    QgsCoordinateTransform, QgsVectorLayer, QgsPointXY, QgsFeature,
+    QgsGeometry, QgsProject, QgsMapLayerProxyModel, Qgis, QgsCoordinateReferenceSystem, QgsUnitTypes)
 
-from PyQt4.QtGui import QIcon, QDialog, QDialogButtonBox
-from PyQt4 import uic
+from qgis.gui import QgsMessageBar
+
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 
 epsg4326 = QgsCoordinateReferenceSystem("EPSG:4326")
 
@@ -33,7 +36,7 @@ class SiteSeeWidget(QDialog, FORM_CLASS):
             self.showErrorMessage("No valid layer to process")
             return
 
-        
+
         # We need to make sure all the points in the layer are transformed to EPSG:4326
         layerCRS = layer.crs()
         self.transform = QgsCoordinateTransform(layerCRS, epsg4326)
@@ -50,7 +53,7 @@ class SiteSeeWidget(QDialog, FORM_CLASS):
         '''The dialog is being shown. We need to initialize it.'''
         super(SiteSeeWidget, self).showEvent(event)
         self.findFields()
-        
+
     def findFields(self):
         if not self.isVisible():
             return
@@ -70,7 +73,7 @@ class SiteSeeWidget(QDialog, FORM_CLASS):
         self.azimuthComboBox.addItems(header)
         self.beamwidthComboBox.addItems(header)
         self.sectorsizeComboBox.addItems(header)
-        
+
 
     def clearLayerFields(self):
 
@@ -79,7 +82,7 @@ class SiteSeeWidget(QDialog, FORM_CLASS):
         self.sectorsizeComboBox.clear()
         self.progressBar.setValue(0)
 
-            
+
     def showErrorMessage(self, message):
         self.iface.messageBar().pushMessage("", message, level=QgsMessageBar.WARNING, duration=3)
 
@@ -87,12 +90,12 @@ class SiteSeeWidget(QDialog, FORM_CLASS):
     def processSectors(self, layer, outname, azimcol, beamwidthcol, sectorsizecol, defaultBW, defaultSS):
 
         fields = layer.pendingFields()
-        
+
         polygonLayer = QgsVectorLayer("Polygon?crs=epsg:4326", outname, "memory")
         ppolygon = polygonLayer.dataProvider()
         ppolygon.addAttributes(fields)
         polygonLayer.updateFields()
-        
+
         iter = layer.getFeatures()
 
         # Count all selected feature
@@ -144,20 +147,21 @@ class SiteSeeWidget(QDialog, FORM_CLASS):
                     g = self.geod.Direct(pt.y(), pt.x(), sangle, sectorsize, Geodesic.LATITUDE | Geodesic.LONGITUDE)
                     pts.append(QgsPoint(g['lon2'], g['lat2']))
                     sangle += 4.0
-                    
+
                 g = self.geod.Direct(pt.y(), pt.x(), eangle, sectorsize, Geodesic.LATITUDE | Geodesic.LONGITUDE)
                 pts.append(QgsPoint(g['lon2'], g['lat2']))
                 pts.append(pt)
-                    
+
                 featureout = QgsFeature()
                 featureout.setGeometry(QgsGeometry.fromPolygon([pts]))
                 featureout.setAttributes(feature.attributes())
                 ppolygon.addFeatures([featureout])
             except:
                 pass
-                
+
         polygonLayer.updateExtents()
-        QgsMapLayerRegistry.instance().addMapLayer(polygonLayer)
+        #QgsMapLayerRegistry.instance().addMapLayer(polygonLayer)
+        QgsProject.instance().addMapLayer(polygonLayer)
 
     def accept(self):
         self.apply()

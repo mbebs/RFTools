@@ -20,11 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtGui import QAction, QIcon
-from PyQt4.QtCore import QUrl
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
+from qgis.core import QgsVectorLayer, QgsWkbTypes
 
 # Import the code for the dialog
 from .siteSee import SiteSeeWidget
+
 import os.path
 import webbrowser
 
@@ -44,20 +47,29 @@ class RFTools:
 
     def initGui(self):
 
-        # Initialize the create shape menu item
+        # NetworkView Menu
         icon = QIcon(os.path.dirname(__file__) + '/images/tower.png')
-        self.siteSeeAction = QAction(icon, u'SiteSee', self.iface.mainWindow())
+        self.siteSeeAction = QAction(icon, u'NetworkView', self.iface.mainWindow())
+        self.siteSeeAction.triggered.connect(self.siteSeeTool)
+        self.iface.addPluginToMenu(u'RF Tools', self.siteSeeAction)
+        self.toolbar.addAction(self.siteSeeAction)
+
+        # NetworkView Menu
+        icon = QIcon(os.path.dirname(__file__) + '/images/tower.png')
+        self.siteSeeAction = QAction(icon, u'PCI/RSI Planner', self.iface.mainWindow())
         self.siteSeeAction.triggered.connect(self.siteSeeTool)
         self.iface.addPluginToMenu(u'RF Tools', self.siteSeeAction)
         self.toolbar.addAction(self.siteSeeAction)
 
         # Help
         icon = QIcon(os.path.dirname(__file__) + '/images/help.png')
-        self.helpAction = QAction(icon, u'RF Tools Help', self.iface.mainWindow())
+        self.helpAction = QAction(icon, u'RFTools Help', self.iface.mainWindow())
         self.helpAction.triggered.connect(self.help)
         self.iface.addPluginToMenu(u'RF Tools', self.helpAction)
 
+
     def unload(self):
+
         #Removes the plugin menu item and icon from QGIS GUI."""
         self.iface.removePluginMenu(u'RF Tools', self.siteSeeAction)
         self.iface.removePluginMenu(u'RF Tools', self.helpAction)
