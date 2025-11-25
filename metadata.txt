@@ -9,12 +9,12 @@
 [general]
 name=RF Tools
 qgisMinimumVersion=3.0
-description=QGIS plugin tools for RF and Wireless Telecommunication Engineers
-version=1.2
+description=Simple Tools for RF and Wireless Telecom Engineers.
+version=3.3
 author=Leonard Fodje
 email=mbebs@live.com
 
-about=RFTools is a QGIS plugin containing a series of tools useful for RF and Wireless Telecommunication Engineers.
+about=RF Tools are a collection of simple tools to aid the RF engineer. These are:- Site See,for sector visualization, PCI and RSI planning, Azimuth Optimizer, Tilt Optimizer, Basic Coverage prediction and Interference Analysis for both LTE (4G) and NR (5G) networks.
 
 tracker=https://github.com/mbebs/RFTools
 repository=https://github.com/mbebs/RFTools
@@ -26,11 +26,11 @@ repository=https://github.com/mbebs/RFTools
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=RF, Tools, Engineer, Telecom, Wireless, LTE
+tags=RF, Tools, Engineer, Telecom, Wireless, LTE, NR, 5G, 4G, Coverage, Interference, Site See, PCI, RSI, Azimuth Optimizer, Tilt Optimizer, Basic Coverage, Interference Analysis.
 
 homepage=https://github.com/mbebs/RFTools
 category=Plugins
-icon=icon.png
+icon=icon.svg
 # experimental flag
 experimental=False
 

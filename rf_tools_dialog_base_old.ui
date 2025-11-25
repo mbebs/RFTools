@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RFToolsDialogBase</class>
+ <widget class="QDialog" name="RFToolsDialogBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>RF Tools - Site See</string>
+  </property>
+  <widget class="QDialogButtonBox" name="button_box">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>580</y>
+     <width>171</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="selectLayer_label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select Layer :&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectLayerComboBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>400</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="siteLatLabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>120</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Site Latitude Field:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="siteLat_Combo_Box">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>400</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="siteLonLabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>120</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Site Longitude Field:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="siteLon_Combo_Box">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>400</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="azimuthLabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Azimuth Column :</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="azimuth_Combo_Box">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>210</y>
+     <width>400</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>250</y>
+     <width>400</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Antenna BeamWidth</string>
+   </property>
+   <widget class="QLabel" name="beamWidth_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>BeamWidth Column :</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="beamWidth_ComboBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>360</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="beamWidth_label2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>161</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OR enter BeamWidth (Degrees ) :</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="beamWidth_edit">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>80</y>
+      <width>120</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>380</y>
+     <width>400</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Sector Size</string>
+   </property>
+   <widget class="QLabel" name="sectorSize_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sector Size Column :</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="sectorSize_ComboBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>360</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="sectorSize_label2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OR enter Sector Size (Miiles) :</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="sectorSize_edit">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>80</y>
+      <width>120</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="newLayer_label">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>520</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>New Layer Name :</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="newLayerName_edit">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>540</y>
+     <width>400</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>button_box</sender>
+   <signal>accepted()</signal>
+   <receiver>RFToolsDialogBase</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>button_box</sender>
+   <signal>rejected()</signal>
+   <receiver>RFToolsDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <widget class="QTextBrowser" name="infoTextBrowser">
+  <property name="geometry">
+   <rect>
+    <x>470</x>
+    <y>30</y>
+    <width>260</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="html">
+   <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;&lt;style type="text/css"&gt;
+p { margin: 8px 0; }
+h3 { color: #2196F3; margin-top: 12px; }
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;h3&gt;Site See - Sector Visualization&lt;/h3&gt;
+&lt;p&gt;&lt;b&gt;Purpose:&lt;/b&gt; Creates sector polygons and visualizes cell site coverage patterns.&lt;/p&gt;
+
+&lt;h3&gt;Instructions:&lt;/h3&gt;
+&lt;p&gt;1. Select a layer containing site/sector data&lt;/p&gt;
+&lt;p&gt;2. Map the required fields:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;b&gt;Site Coordinates:&lt;/b&gt; Hub/site location&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Azimuth:&lt;/b&gt; Sector pointing direction (0-360°)&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Beamwidth:&lt;/b&gt; Horizontal coverage angle&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Sector Size:&lt;/b&gt; Coverage radius in meters&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3. Optionally map sector coordinates if different from site&lt;/p&gt;
+&lt;p&gt;4. Specify output layer name&lt;/p&gt;
+&lt;p&gt;5. Click OK to generate sectors&lt;/p&gt;
+
+&lt;h3&gt;Features:&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Creates wedge-shaped sector polygons&lt;/li&gt;
+&lt;li&gt;Handles co-located and remote sectors&lt;/li&gt;
+&lt;li&gt;Draws lines to remote sector locations&lt;/li&gt;
+&lt;li&gt;Preserves all original attributes&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Tips:&lt;/h3&gt;
+&lt;p&gt;• Typical beamwidth: 65° for macro cells&lt;/p&gt;
+&lt;p&gt;• Typical sector size: 500-2000m&lt;/p&gt;
+&lt;p&gt;• Use site coordinates for co-located sectors&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</string>
+  </property>
+ </widget>
+</ui>

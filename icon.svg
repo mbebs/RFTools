@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background - Solid Blue -->
+  <rect width="24" height="24" fill="#1976D2" rx="2"/>
+  
+  <!-- Signal strength bars (5 bars, all white, centered) -->
+  <g transform="translate(12, 18)">
+    <!-- Bar 1 (shortest) -->
+    <rect x="-7.6" y="-3" width="2.4" height="3" fill="white" rx="0.5"/>
+    
+    <!-- Bar 2 -->
+    <rect x="-4.4" y="-5.5" width="2.4" height="5.5" fill="white" rx="0.5"/>
+    
+    <!-- Bar 3 (middle) -->
+    <rect x="-1.2" y="-8" width="2.4" height="8" fill="white" rx="0.5"/>
+    
+    <!-- Bar 4 -->
+    <rect x="2" y="-10.5" width="2.4" height="10.5" fill="white" rx="0.5"/>
+    
+    <!-- Bar 5 (tallest) -->
+    <rect x="5.2" y="-13" width="2.4" height="13" fill="white" rx="0.5"/>
+  </g>
+</svg>

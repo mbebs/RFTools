@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#4CAF50"/>
+  <!-- WiFi Signal Meter Icon -->
+  <!-- Base point -->
+  <circle cx="12" cy="18" r="1.5" fill="white"/>
+  <!-- Signal arc 1 (weakest) -->
+  <path d="M 9 15 Q 12 13 15 15" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <!-- Signal arc 2 -->
+  <path d="M 7 12 Q 12 9 17 12" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.8"/>
+  <!-- Signal arc 3 (strongest) -->
+  <path d="M 5 9 Q 12 5 19 9" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
