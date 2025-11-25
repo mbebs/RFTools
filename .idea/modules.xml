@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/RFTools.iml" filepath="$PROJECT_DIR$/.idea/RFTools.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../.idea/plugins.iml" filepath="$PROJECT_DIR$/../.idea/plugins.iml" />
     </modules>
   </component>
 </project>

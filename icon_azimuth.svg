@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="24" fill="#00BCD4"/>
+  <!-- Center point (site) -->
+  <circle cx="12" cy="12" r="2" fill="white"/>
+  <!-- Rotating arrows showing azimuth adjustment -->
+  <path d="M12 6 L12 4 L10 6 L12 6 L14 6 Z" fill="white"/>
+  <path d="M18 12 L20 12 L18 10 L18 12 L18 14 Z" fill="white"/>
+  <path d="M12 18 L12 20 L14 18 L12 18 L10 18 Z" fill="white"/>
+  <path d="M6 12 L4 12 L6 14 L6 12 L6 10 Z" fill="white"/>
+  <!-- Circular arrow -->
+  <path d="M 16 8 A 5.5 5.5 0 0 1 16 16" stroke="white" stroke-width="1.5" fill="none" opacity="0.7"/>
+  <path d="M 8 16 A 5.5 5.5 0 0 1 8 8" stroke="white" stroke-width="1.5" fill="none" opacity="0.7"/>
+</svg>
