@@ -6,7 +6,7 @@ import math
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsProject, QgsField, QgsVectorLayer, QgsFeature
+from qgis.core import QgsProject, QgsField, QgsVectorLayer, QgsFeature, QgsWkbTypes
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'azimuth_optimizer_dialog_base.ui'))
@@ -23,6 +23,24 @@ class AzimuthOptimizerDialog(QtWidgets.QDialog, FORM_CLASS):
         self.runButton.clicked.connect(self._run_optimizer)
 
         self._populate_layers()
+    
+    def _safe_float(self, value, default=0.0):
+        """Safely convert a value to float, returning default if conversion fails."""
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+    
+    def _get_point_from_geometry(self, geom):
+        """Extract a point from any geometry type."""
+        if geom.type() == QgsWkbTypes.PointGeometry:
+            return geom.asPoint()
+        else:
+            # For LineString, Polygon, or other geometries, use centroid
+            centroid = geom.centroid()
+            return centroid.asPoint() if centroid else None
 
     def _populate_layers(self):
         self.layerComboBox.clear()
@@ -126,6 +144,11 @@ class AzimuthOptimizerDialog(QtWidgets.QDialog, FORM_CLASS):
             if not geom or geom.isEmpty():
                 continue
             
+            # Extract point from geometry (handles Point, LineString, Polygon, etc.)
+            point = self._get_point_from_geometry(geom)
+            if point is None:
+                continue
+            
             site_id = str(feat[site_id_idx]) if site_id_idx != -1 else 'unknown'
             band = str(feat[band_idx]) if band_idx != -1 else 'default'
             key = f"{site_id}_{band}"
@@ -135,9 +158,9 @@ class AzimuthOptimizerDialog(QtWidgets.QDialog, FORM_CLASS):
             
             site_sectors[key].append({
                 'feature': feat,
-                'point': geom.asPoint(),
-                'azimuth': float(feat[azimuth_idx]) if azimuth_idx != -1 and feat[azimuth_idx] is not None else 0.0,
-                'beamwidth': float(feat[beamwidth_idx]) if beamwidth_idx != -1 and feat[beamwidth_idx] is not None else 65.0,
+                'point': point,
+                'azimuth': self._safe_float(feat[azimuth_idx], 0.0) if azimuth_idx != -1 else 0.0,
+                'beamwidth': self._safe_float(feat[beamwidth_idx], 65.0) if beamwidth_idx != -1 else 65.0,
                 'locked': bool(feat[locked_idx]) if locked_idx != -1 and feat[locked_idx] is not None else False,
             })
 

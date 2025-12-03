@@ -14,7 +14,7 @@ from qgis.core import (QgsProject, QgsVectorLayer, QgsRasterLayer,
                        QgsRasterFileWriter, QgsRasterPipe, QgsRasterShader,
                        QgsColorRampShader, QgsSingleBandPseudoColorRenderer,
                        QgsPointXY, QgsRectangle, QgsCoordinateReferenceSystem,
-                       QgsCoordinateTransform)
+                       QgsCoordinateTransform, QgsWkbTypes)
 from qgis.gui import QgsMapToolExtent
 from osgeo import gdal, osr
 import tempfile
@@ -72,6 +72,24 @@ class CoveragePredictionDialog(QtWidgets.QDialog, FORM_CLASS):
             self.extentInfoLabel.setText('')
 
         self._populate_layers()
+    
+    def _safe_float(self, value, default=0.0):
+        """Safely convert a value to float, returning default if conversion fails."""
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+    
+    def _get_point_from_geometry(self, geom):
+        """Extract a point from any geometry type."""
+        if geom.type() == QgsWkbTypes.PointGeometry:
+            return geom.asPoint()
+        else:
+            # For LineString, Polygon, or other geometries, use centroid
+            centroid = geom.centroid()
+            return centroid.asPoint() if centroid else None
     
     def _draw_custom_extent(self):
         """Start drawing custom extent on map."""
@@ -430,18 +448,18 @@ class CoveragePredictionDialog(QtWidgets.QDialog, FORM_CLASS):
             if not geom or geom.isEmpty():
                 continue
             
-            site_point = geom.asPoint()
-            
-            # Get parameters
-            try:
-                height = float(feat[height_idx]) if height_idx != -1 and feat[height_idx] is not None else 30.0
-                azimuth = float(feat[azimuth_idx]) if azimuth_idx != -1 and feat[azimuth_idx] is not None else 0.0
-                beamwidth = float(feat[beamwidth_idx]) if beamwidth_idx != -1 and feat[beamwidth_idx] is not None else 65.0
-                power = float(feat[power_idx]) if power_idx != -1 and feat[power_idx] is not None else 43.0
-                gain = float(feat[gain_idx]) if gain_idx != -1 and feat[gain_idx] is not None else 18.0
-                frequency = float(feat[frequency_idx]) if frequency_idx != -1 and feat[frequency_idx] is not None else 2100.0
-            except (ValueError, TypeError):
+            # Extract point from geometry (handles Point, LineString, Polygon, etc.)
+            site_point = self._get_point_from_geometry(geom)
+            if site_point is None:
                 continue
+            
+            # Get parameters (with safe conversion from field values)
+            height = self._safe_float(feat[height_idx], 30.0) if height_idx != -1 else 30.0
+            azimuth = self._safe_float(feat[azimuth_idx], 0.0) if azimuth_idx != -1 else 0.0
+            beamwidth = self._safe_float(feat[beamwidth_idx], 65.0) if beamwidth_idx != -1 else 65.0
+            power = self._safe_float(feat[power_idx], 43.0) if power_idx != -1 else 43.0
+            gain = self._safe_float(feat[gain_idx], 18.0) if gain_idx != -1 else 18.0
+            frequency = self._safe_float(feat[frequency_idx], 2100.0) if frequency_idx != -1 else 2100.0
             
             # Calculate coverage for this site
             self._calculate_site_coverage(

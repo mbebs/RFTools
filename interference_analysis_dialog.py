@@ -27,6 +27,15 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
         self.runButton.clicked.connect(self._run_analysis)
 
         self._populate_layers()
+    
+    def _get_point_from_geometry(self, geom):
+        """Extract a point from any geometry type."""
+        if geom.type() == QgsWkbTypes.PointGeometry:
+            return geom.asPoint()
+        else:
+            # For LineString, Polygon, or other geometries, use centroid
+            centroid = geom.centroid()
+            return centroid.asPoint() if centroid else None
 
     def _populate_layers(self):
         self.layerComboBox.clear()
@@ -111,6 +120,11 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
             if not geom or geom.isEmpty():
                 continue
             
+            # Extract point from geometry (handles Point, LineString, Polygon, etc.)
+            point = self._get_point_from_geometry(geom)
+            if point is None:
+                continue
+            
             # Create sector identifier from site_id + sector + band
             site_id = str(feat[site_id_idx]) if site_id_idx != -1 and feat[site_id_idx] is not None else ''
             sector = str(feat[sector_idx]) if sector_idx != -1 and feat[sector_idx] is not None else ''
@@ -136,7 +150,7 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
             
             sectors.append({
                 'feature': feat,
-                'point': geom.asPoint(),
+                'point': point,
                 'frequency': safe_float(feat[freq_idx]) if freq_idx != -1 else 0,
                 'pci': safe_int(feat[pci_idx]) if pci_idx != -1 else -1,
                 'band': str(feat[band_idx]) if band_idx != -1 else 'unknown',

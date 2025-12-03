@@ -26,6 +26,24 @@ class TiltOptimizerDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progressBar.setValue(0)
 
         self._populate_layers()
+    
+    def _safe_float(self, value, default=0.0):
+        """Safely convert a value to float, returning default if conversion fails."""
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+    
+    def _get_point_from_geometry(self, geom):
+        """Extract a point from any geometry type."""
+        if geom.type() == QgsWkbTypes.PointGeometry:
+            return geom.asPoint()
+        else:
+            # For LineString, Polygon, or other geometries, use centroid
+            centroid = geom.centroid()
+            return centroid.asPoint() if centroid else None
 
     def _populate_layers(self):
         self.layerComboBox.clear()
@@ -140,13 +158,19 @@ class TiltOptimizerDialog(QtWidgets.QDialog, FORM_CLASS):
         sectors = []
         for feat in features:
             geom = feat.geometry()
-            if geom.type() == QgsWkbTypes.PointGeometry:
-                point = geom.asPoint()
-                sectors.append({
-                    'feature': feat,
-                    'point': point,
-                    'height': float(feat[height_idx]) if height_idx != -1 and feat[height_idx] is not None else 30.0
-                })
+            if not geom or geom.isEmpty():
+                continue
+            
+            # Extract point from geometry (handles Point, LineString, Polygon, etc.)
+            point = self._get_point_from_geometry(geom)
+            if point is None:
+                continue
+            
+            sectors.append({
+                'feature': feat,
+                'point': point,
+                'height': self._safe_float(feat[height_idx], 30.0) if height_idx != -1 else 30.0
+            })
         
         # Calculate optimal tilt for each feature
         self.progressBar.setValue(10)
@@ -155,20 +179,17 @@ class TiltOptimizerDialog(QtWidgets.QDialog, FORM_CLASS):
         
         output_features = []
         for idx, feat in enumerate(features):
-            # Get parameters
-            height = float(feat[height_idx]) if height_idx != -1 and feat[height_idx] is not None else 30.0
-            v_beamwidth = float(feat[v_beamwidth_idx]) if v_beamwidth_idx != -1 and feat[v_beamwidth_idx] is not None else 10.0
-            h_beamwidth = float(feat[h_beamwidth_idx]) if h_beamwidth_idx != -1 and feat[h_beamwidth_idx] is not None else 65.0
-            pmax = float(feat[pmax_idx]) if pmax_idx != -1 and feat[pmax_idx] is not None else 43.0
-            antenna_gain = float(feat[antenna_gain_idx]) if antenna_gain_idx != -1 and feat[antenna_gain_idx] is not None else 18.0
-            frequency = float(feat[frequency_idx]) if frequency_idx != -1 and feat[frequency_idx] is not None else 2100.0
+            # Get parameters (with safe conversion from field values)
+            height = self._safe_float(feat[height_idx], 30.0) if height_idx != -1 else 30.0
+            v_beamwidth = self._safe_float(feat[v_beamwidth_idx], 10.0) if v_beamwidth_idx != -1 else 10.0
+            h_beamwidth = self._safe_float(feat[h_beamwidth_idx], 65.0) if h_beamwidth_idx != -1 else 65.0
+            pmax = self._safe_float(feat[pmax_idx], 43.0) if pmax_idx != -1 else 43.0
+            antenna_gain = self._safe_float(feat[antenna_gain_idx], 18.0) if antenna_gain_idx != -1 else 18.0
+            frequency = self._safe_float(feat[frequency_idx], 2100.0) if frequency_idx != -1 else 2100.0
 
             # Get sector position
             geom = feat.geometry()
-            if geom.type() == QgsWkbTypes.PointGeometry:
-                point = geom.asPoint()
-            else:
-                point = None
+            point = self._get_point_from_geometry(geom) if geom and not geom.isEmpty() else None
             
             # Find neighbors for this sector
             neighbors = self._find_neighbors(point, sectors, feat.id(), target_distance * 2) if point else []
