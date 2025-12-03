@@ -26,10 +26,8 @@ from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from qgis.core import (QgsProject, QgsApplication, QgsVectorLayer, QgsFeature, 
                        QgsGeometry, QgsPointXY, QgsField, QgsFields, QgsWkbTypes,
                        QgsSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer,
-                       QgsFillSymbol)
+                       QgsFillSymbol, QgsMarkerSymbol, QgsSingleSymbolRenderer)
 from qgis.gui import QgsMapToolEmitPoint
-from qgis.core import (QgsProject, QgsApplication, QgsVectorLayer, QgsFeature, 
-                       QgsGeometry, QgsPointXY, QgsField, QgsFields, QgsWkbTypes)
 from qgis.PyQt.QtCore import QVariant
 import math
 # Initialize Qt resources from file resources.py
@@ -41,6 +39,10 @@ from .tilt_optimizer_dialog import TiltOptimizerDialog
 from .azimuth_optimizer_dialog import AzimuthOptimizerDialog
 from .coverage_prediction_dialog import CoveragePredictionDialog
 from .interference_analysis_dialog import InterferenceAnalysisDialog
+from .vendor_import_dialog import VendorImportDialog
+from .database_connector_dialog import DatabaseConnectorDialog
+from .drive_test_dialog import DriveTestDialog
+from .performance_dashboard_dialog import PerformanceDashboardDialog
 from .about_dialog import AboutRFToolsDialog
 import os.path
 
@@ -264,6 +266,50 @@ class RFTools:
         self.iface.addPluginToMenu(self.menu, interference_action)
         self.actions.append(interference_action)
 
+        # Vendor Import/Export icon
+        vendor_icon_path = os.path.join(self.plugin_dir, 'icon_vendor.svg')
+        if not os.path.exists(vendor_icon_path):
+            vendor_icon_path = default_icon_path
+        vendor_icon = QIcon(vendor_icon_path)
+        vendor_action = QAction(vendor_icon, self.tr(u'Vendor Import/Export'), self.iface.mainWindow())
+        vendor_action.triggered.connect(self.run_vendor_import)
+        self.toolbar.addAction(vendor_action)
+        self.iface.addPluginToMenu(self.menu, vendor_action)
+        self.actions.append(vendor_action)
+
+        # Database Connector icon
+        database_icon_path = os.path.join(self.plugin_dir, 'icon_database.svg')
+        if not os.path.exists(database_icon_path):
+            database_icon_path = default_icon_path
+        database_icon = QIcon(database_icon_path)
+        database_action = QAction(database_icon, self.tr(u'Database Connector'), self.iface.mainWindow())
+        database_action.triggered.connect(self.run_database_connector)
+        self.toolbar.addAction(database_action)
+        self.iface.addPluginToMenu(self.menu, database_action)
+        self.actions.append(database_action)
+
+        # Drive Test Import/Analysis icon
+        drivetest_icon_path = os.path.join(self.plugin_dir, 'icon_drivetest.svg')
+        if not os.path.exists(drivetest_icon_path):
+            drivetest_icon_path = default_icon_path
+        drivetest_icon = QIcon(drivetest_icon_path)
+        drivetest_action = QAction(drivetest_icon, self.tr(u'Drive Test Import/Analysis'), self.iface.mainWindow())
+        drivetest_action.triggered.connect(self.run_drive_test)
+        self.toolbar.addAction(drivetest_action)
+        self.iface.addPluginToMenu(self.menu, drivetest_action)
+        self.actions.append(drivetest_action)
+
+        # Performance Dashboard icon
+        dashboard_icon_path = os.path.join(self.plugin_dir, 'icon_dashboard.svg')
+        if not os.path.exists(dashboard_icon_path):
+            dashboard_icon_path = default_icon_path
+        dashboard_icon = QIcon(dashboard_icon_path)
+        dashboard_action = QAction(dashboard_icon, self.tr(u'Network Performance Dashboard'), self.iface.mainWindow())
+        dashboard_action.triggered.connect(self.run_performance_dashboard)
+        self.toolbar.addAction(dashboard_action)
+        self.iface.addPluginToMenu(self.menu, dashboard_action)
+        self.actions.append(dashboard_action)
+
         # About RF Tools icon (orange)
         about_icon_path = os.path.join(self.plugin_dir, 'icon_about.svg')
         if not os.path.exists(about_icon_path):
@@ -414,14 +460,14 @@ class RFTools:
         
         site_provider = site_layer.dataProvider()
         site_fields = QgsFields()
-        site_lat_field = QgsField('site_lat', QVariant.Double)
-        site_lat_field.setLength(20)
-        site_lat_field.setPrecision(6)
-        site_fields.append(site_lat_field)
-        site_lon_field = QgsField('site_lon', QVariant.Double)
-        site_lon_field.setLength(20)
-        site_lon_field.setPrecision(6)
-        site_fields.append(site_lon_field)
+        site_lat_field_obj = QgsField('site_lat', QVariant.Double)
+        site_lat_field_obj.setLength(20)
+        site_lat_field_obj.setPrecision(6)
+        site_fields.append(site_lat_field_obj)
+        site_lon_field_obj = QgsField('site_lon', QVariant.Double)
+        site_lon_field_obj.setLength(20)
+        site_lon_field_obj.setPrecision(6)
+        site_fields.append(site_lon_field_obj)
         site_provider.addAttributes(site_fields)
         site_layer.updateFields()
         
@@ -470,7 +516,10 @@ class RFTools:
         for key in site_sectors:
             site_sectors[key].sort(key=lambda x: x[1] if x[1] else 0)
         
-        # Second pass: create sectors with proper sizing
+        # Second pass: create sectors with proper sizing and z-order
+        # First, collect all features with their calculated radius for sorting
+        sector_data = []
+        
         for feat in source_layer.getFeatures():
             geom = feat.geometry()
             
@@ -577,12 +626,25 @@ class RFTools:
             # Convert meters to degrees (rough approximation: 1 degree ≈ 111,000 meters at equator)
             radius_deg = adjusted_radius_meters / 111000.0
             
-            # Create sector polygon
+            # Create sector polygon and store with calculated radius for sorting
             sector_geom = self._create_sector_polygon(sector_point, azimuth, beamwidth, radius_deg)
             
+            # Store feature data with radius for sorting
+            sector_data.append({
+                'feature': feat,
+                'geometry': sector_geom,
+                'radius': radius_deg,
+                'band_value': band_value if band_field else 0
+            })
+        
+        # Sort sectors by radius in descending order (largest first) so smaller sectors are drawn on top
+        sector_data.sort(key=lambda x: (-x['radius'], x['band_value']))
+        
+        # Create features in sorted order
+        for data in sector_data:
             sector_feat = QgsFeature()
-            sector_feat.setGeometry(sector_geom)
-            sector_feat.setAttributes(feat.attributes())
+            sector_feat.setGeometry(data['geometry'])
+            sector_feat.setAttributes(data['feature'].attributes())
             sector_features.append(sector_feat)
         
         # Create site point features
@@ -727,82 +789,88 @@ class RFTools:
         layer.triggerRepaint()
     
     def _apply_band_colors(self, layer, band_field):
-        """Apply color coding to sectors based on band/frequency"""
+        """Apply color coding to sectors based on unique band values"""
         if not band_field:
             return
         
-        # Define band ranges and colors
-        # Common cellular bands with distinct colors
+        # Get unique band values from the layer
+        unique_bands = set()
+        for feature in layer.getFeatures():
+            band_value = feature[band_field]
+            if band_value is not None and str(band_value).strip():
+                try:
+                    # Try to convert to float for numeric bands, otherwise use as string
+                    band_float = float(band_value)
+                    # If conversion succeeds and it's a whole number, use as int string
+                    if band_float.is_integer():
+                        band_str = str(int(band_float))
+                    else:
+                        band_str = str(band_float)
+                except (ValueError, TypeError):
+                    # If conversion fails, use as string
+                    band_str = str(band_value)
+                unique_bands.add(band_str)
+        
+        if not unique_bands:
+            return
+        
+        # Sort the bands for consistent ordering
+        try:
+            # Try to sort numerically if all bands can be converted to numbers
+            sorted_bands = sorted(unique_bands, key=lambda x: float(x) if x.replace('.', '', 1).isdigit() else float('inf'))
+        except (ValueError, TypeError):
+            # Fall back to string sort if any band can't be converted to a number
+            sorted_bands = sorted(unique_bands)
+        
+        # Define a color palette with enough distinct colors
+        # Using a perceptually distinct color palette
+        color_palette = [
+            (192, 57, 43),    # Dark Red
+            (52, 152, 219),   # Blue
+            (46, 204, 113),   # Green
+            (230, 126, 34),   # Orange
+            (155, 89, 182),   # Purple
+            (241, 196, 15),   # Yellow
+            (22, 160, 133),   # Teal
+            (231, 76, 60),    # Red
+            (41, 128, 185),   # Dark Blue
+            (39, 174, 96),    # Dark Green
+            (211, 84, 0),     # Dark Orange
+            (142, 68, 173),   # Dark Purple
+            (243, 156, 18),   # Dark Yellow
+            (44, 62, 80),     # Dark Gray
+            (127, 140, 141)   # Gray
+        ]
+        
+        # Create categories for each unique band
         categories = []
+        for i, band in enumerate(sorted_bands):
+            # Cycle through the color palette if we have more bands than colors
+            color_idx = i % len(color_palette)
+            r, g, b = color_palette[color_idx]
+            
+            # Create a slightly darker version for the outline
+            outline_r = max(0, r - 40)
+            outline_g = max(0, g - 40)
+            outline_b = max(0, b - 40)
+            
+            # Create the symbol with semi-transparent fill
+            symbol = QgsFillSymbol.createSimple({
+                'color': f'{r},{g},{b},180',
+                'outline_color': f'{outline_r},{outline_g},{outline_b}',
+                'outline_width': '0.5'
+            })
+            
+            # Create the category
+            cat = QgsRendererCategory(
+                band,
+                symbol,
+                f'Band {band}'
+            )
+            categories.append(cat)
         
-        # 700 MHz (Low band) - Dark Red
-        cat_700 = QgsRendererCategory(
-            '700',
-            QgsFillSymbol.createSimple({'color': '192,57,43,180', 'outline_color': '128,38,28', 'outline_width': '0.5'}),
-            '700 MHz'
-        )
-        categories.append(cat_700)
-        
-        # 850 MHz (Low band) - Red
-        cat_850 = QgsRendererCategory(
-            '850',
-            QgsFillSymbol.createSimple({'color': '231,76,60,180', 'outline_color': '192,57,43', 'outline_width': '0.5'}),
-            '850 MHz'
-        )
-        categories.append(cat_850)
-        
-        # 1800 MHz (Mid band) - Orange
-        cat_1800 = QgsRendererCategory(
-            '1800',
-            QgsFillSymbol.createSimple({'color': '230,126,34,180', 'outline_color': '211,84,0', 'outline_width': '0.5'}),
-            '1800 MHz'
-        )
-        categories.append(cat_1800)
-        
-        # 2100 MHz (Mid band) - Yellow
-        cat_2100 = QgsRendererCategory(
-            '2100',
-            QgsFillSymbol.createSimple({'color': '241,196,15,180', 'outline_color': '212,172,13', 'outline_width': '0.5'}),
-            '2100 MHz'
-        )
-        categories.append(cat_2100)
-        
-        # 2600 MHz (High band) - Green
-        cat_2600 = QgsRendererCategory(
-            '2600',
-            QgsFillSymbol.createSimple({'color': '46,204,113,180', 'outline_color': '39,174,96', 'outline_width': '0.5'}),
-            '2600 MHz'
-        )
-        categories.append(cat_2600)
-        
-        # 3500 MHz (High band) - Blue
-        cat_3500 = QgsRendererCategory(
-            '3500',
-            QgsFillSymbol.createSimple({'color': '52,152,219,180', 'outline_color': '41,128,185', 'outline_width': '0.5'}),
-            '3500 MHz'
-        )
-        categories.append(cat_3500)
-        
-        # Other - Purple
-        cat_other = QgsRendererCategory(
-            'Other',
-            QgsFillSymbol.createSimple({'color': '155,89,182,180', 'outline_color': '125,60,152', 'outline_width': '0.5'}),
-            'Other'
-        )
-        categories.append(cat_other)
-        
-        # Create expression to categorize bands
-        expression = f'''
-        CASE 
-            WHEN "{band_field}" >= 690 AND "{band_field}" <= 710 THEN '700'
-            WHEN "{band_field}" >= 840 AND "{band_field}" <= 860 THEN '850'
-            WHEN "{band_field}" >= 1700 AND "{band_field}" <= 1900 THEN '1800'
-            WHEN "{band_field}" >= 2000 AND "{band_field}" <= 2200 THEN '2100'
-            WHEN "{band_field}" >= 2500 AND "{band_field}" <= 2700 THEN '2600'
-            WHEN "{band_field}" >= 3400 AND "{band_field}" <= 3600 THEN '3500'
-            ELSE 'Other'
-        END
-        '''
+        # Use the band field directly for rendering
+        expression = f'"{band_field}"'
         
         renderer = QgsCategorizedSymbolRenderer(expression, categories)
         layer.setRenderer(renderer)
@@ -837,6 +905,30 @@ class RFTools:
     def run_interference_analysis(self):
         """Open the Interference Analysis dialog."""
         dlg = InterferenceAnalysisDialog(self.iface, self.iface.mainWindow())
+        dlg.exec_()
+
+
+    def run_vendor_import(self):
+        """Open the Vendor Import/Export dialog."""
+        dlg = VendorImportDialog(self.iface, self.iface.mainWindow())
+        dlg.exec_()
+
+
+    def run_database_connector(self):
+        """Open the Database Connector dialog."""
+        dlg = DatabaseConnectorDialog(self.iface, self.iface.mainWindow())
+        dlg.exec_()
+
+
+    def run_drive_test(self):
+        """Open the Drive Test Import/Analysis dialog."""
+        dlg = DriveTestDialog(self.iface, self.iface.mainWindow())
+        dlg.exec_()
+
+
+    def run_performance_dashboard(self):
+        """Open the Network Performance Dashboard dialog."""
+        dlg = PerformanceDashboardDialog(self.iface, self.iface.mainWindow())
         dlg.exec_()
 
 

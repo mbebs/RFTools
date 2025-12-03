@@ -10,7 +10,7 @@
 name=RF Tools
 qgisMinimumVersion=3.0
 description=Simple Tools for RF and Wireless Telecom Engineers.
-version=3.3
+version=3.4
 author=Leonard Fodje
 email=mbebs@live.com
 

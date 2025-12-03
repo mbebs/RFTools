@@ -88,6 +88,11 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
         interference_distance = self.interferenceDistanceSpinBox.value()
         overlap_threshold = self.overlapThresholdSpinBox.value()
         output_prefix = self.outputPrefixLineEdit.text().strip() or 'Interference'
+        
+        # Get PCI conflict detection options
+        detect_pci_collision = self.pciConflictCheckBox.isChecked()
+        detect_pci_mod3 = self.pciMod3CheckBox.isChecked() if hasattr(self, 'pciMod3CheckBox') else True
+        detect_pci_mod6 = self.pciMod6CheckBox.isChecked() if hasattr(self, 'pciMod6CheckBox') else True
 
         # Get field indices
         fields = layer.fields()
@@ -112,14 +117,31 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
             band = str(feat[band_idx]) if band_idx != -1 and feat[band_idx] is not None else ''
             sector_id = f"{site_id}_{sector}_{band}" if site_id and sector and band else f"Sector_{feat.id()}"
             
+            # Helper function to safely convert QVariant to Python type
+            def safe_float(value):
+                if value is None:
+                    return 0
+                try:
+                    return float(value)
+                except (ValueError, TypeError):
+                    return 0
+            
+            def safe_int(value):
+                if value is None:
+                    return -1
+                try:
+                    return int(value)
+                except (ValueError, TypeError):
+                    return -1
+            
             sectors.append({
                 'feature': feat,
                 'point': geom.asPoint(),
-                'frequency': float(feat[freq_idx]) if freq_idx != -1 and feat[freq_idx] is not None else 0,
-                'pci': int(feat[pci_idx]) if pci_idx != -1 and feat[pci_idx] is not None else -1,
+                'frequency': safe_float(feat[freq_idx]) if freq_idx != -1 else 0,
+                'pci': safe_int(feat[pci_idx]) if pci_idx != -1 else -1,
                 'band': str(feat[band_idx]) if band_idx != -1 else 'unknown',
-                'azimuth': float(feat[azimuth_idx]) if azimuth_idx != -1 and feat[azimuth_idx] is not None else 0,
-                'beamwidth': float(feat[beamwidth_idx]) if beamwidth_idx != -1 and feat[beamwidth_idx] is not None else 65,
+                'azimuth': safe_float(feat[azimuth_idx]) if azimuth_idx != -1 else 0,
+                'beamwidth': safe_float(feat[beamwidth_idx]) if beamwidth_idx != -1 else 65,
                 'sector_id': sector_id,
             })
 
@@ -135,7 +157,19 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
             interference_issues.extend(adjacent_channel)
         
         if self.pciConflictCheckBox.isChecked():
-            pci_conflicts = self._detect_pci_conflicts(sectors, interference_distance, overlap_threshold)
+            # Only pass the detection options that are checked in the UI
+            detect_pci_collision = self.pciCollisionCheckBox.isChecked() if hasattr(self, 'pciCollisionCheckBox') else True
+            detect_pci_mod3 = self.pciMod3CheckBox.isChecked() if hasattr(self, 'pciMod3CheckBox') else True
+            detect_pci_mod6 = self.pciMod6CheckBox.isChecked() if hasattr(self, 'pciMod6CheckBox') else True
+            
+            pci_conflicts = self._detect_pci_conflicts(
+                sectors, 
+                interference_distance, 
+                overlap_threshold,
+                detect_pci_collision=detect_pci_collision,
+                detect_pci_mod3=detect_pci_mod3,
+                detect_pci_mod6=detect_pci_mod6
+            )
             interference_issues.extend(pci_conflicts)
 
         if not interference_issues:
@@ -247,12 +281,26 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
         
         return issues
 
-    def _detect_pci_conflicts(self, sectors, max_distance_km, overlap_threshold):
-        """Detect PCI mod 3 and mod 6 conflicts."""
+    def _detect_pci_conflicts(self, sectors, max_distance_km, overlap_threshold, detect_pci_collision=True, detect_pci_mod3=True, detect_pci_mod6=True):
+        """Detect PCI mod 3 and mod 6 conflicts.
+        
+        Args:
+            sectors: List of sector dictionaries
+            max_distance_km: Maximum distance in km to check for conflicts
+            overlap_threshold: Minimum beam overlap percentage to consider
+            detect_pci_collision: Whether to detect exact PCI collisions
+            detect_pci_mod3: Whether to detect mod 3 conflicts
+            detect_pci_mod6: Whether to detect mod 6 conflicts
+            
+        Returns:
+            List of detected PCI conflict issues
+        """
+        if not any([detect_pci_collision, detect_pci_mod3, detect_pci_mod6]):
+            return []
+            
         issues = []
         
         # PCI re-use distance = interference distance (user input)
-        # Check for PCI conflicts within the same distance as other interference
         pci_reuse_distance_km = max_distance_km
         pci_reuse_distance_deg = pci_reuse_distance_km / 111.0
         
@@ -268,6 +316,10 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
                 if sector1['band'] != sector2['band']:
                     continue
                 
+                # Skip if same site-sector-band combination (duplicate features)
+                if sector1['sector_id'] == sector2['sector_id']:
+                    continue
+                
                 # Check for PCI collision (same PCI) or mod 3/6 conflict
                 same_pci = (sector1['pci'] == sector2['pci'])
                 pci1_mod3 = sector1['pci'] % 3
@@ -275,8 +327,14 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
                 pci1_mod6 = sector1['pci'] % 6
                 pci2_mod6 = sector2['pci'] % 6
                 
-                # Skip if no conflict at all
-                if not same_pci and pci1_mod3 != pci2_mod3 and pci1_mod6 != pci2_mod6:
+                # Skip if no conflict at all based on enabled detection types
+                has_conflict = (
+                    (detect_pci_collision and same_pci) or
+                    (detect_pci_mod3 and not same_pci and pci1_mod3 == pci2_mod3) or
+                    (detect_pci_mod6 and not same_pci and not pci1_mod3 == pci2_mod3 and pci1_mod6 == pci2_mod6)
+                )
+                
+                if not has_conflict:
                     continue
                 
                 # Check distance against PCI re-use distance (not max_distance)
@@ -344,25 +402,60 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
         
         # Add fields
         fields = QgsFields()
+        
+        # Basic info
         type_field = QgsField('type', QVariant.String)
         type_field.setLength(50)
         fields.append(type_field)
+        
         severity_field = QgsField('severity', QVariant.String)
         severity_field.setLength(20)
         fields.append(severity_field)
+        
+        # Source sector info
         source_field = QgsField('source_sector', QVariant.String)
         source_field.setLength(100)
         fields.append(source_field)
+        
+        source_site_id = QgsField('source_site_id', QVariant.String)
+        source_site_id.setLength(50)
+        fields.append(source_site_id)
+        
+        source_sector = QgsField('source_sector_id', QVariant.String)
+        source_sector.setLength(50)
+        fields.append(source_sector)
+        
+        source_band = QgsField('source_band', QVariant.String)
+        source_band.setLength(20)
+        fields.append(source_band)
+        
+        # Target sector info
         target_field = QgsField('target_sector', QVariant.String)
         target_field.setLength(100)
         fields.append(target_field)
+        
+        target_site_id = QgsField('target_site_id', QVariant.String)
+        target_site_id.setLength(50)
+        fields.append(target_site_id)
+        
+        target_sector = QgsField('target_sector_id', QVariant.String)
+        target_sector.setLength(50)
+        fields.append(target_sector)
+        
+        target_band = QgsField('target_band', QVariant.String)
+        target_band.setLength(20)
+        fields.append(target_band)
+        
+        # Distance and details
         distance_field = QgsField('distance_km', QVariant.Double)
         distance_field.setLength(10)
         distance_field.setPrecision(2)
         fields.append(distance_field)
+        
         details_field = QgsField('details', QVariant.String)
         details_field.setLength(255)
         fields.append(details_field)
+        
         provider.addAttributes(fields)
         layer.updateFields()
         
@@ -382,17 +475,35 @@ class InterferenceAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
             elif issue['type'] == 'Adjacent Channel':
                 details += f" (Δf={issue['freq_diff']:.1f} MHz)"
             
-            # Get sector identifiers from sector data
+            # Get sector identifiers and additional info
             source_id = issue['sector1']['sector_id']
             target_id = issue['sector2']['sector_id']
             
+            # Extract site_id, sector_id, and band from sector1 and sector2
+            source_parts = source_id.split('_')
+            target_parts = target_id.split('_')
+            
+            source_site = source_parts[0] if len(source_parts) > 0 else ''
+            source_sec = source_parts[1] if len(source_parts) > 1 else ''
+            source_bnd = source_parts[2] if len(source_parts) > 2 else issue['sector1'].get('band', '')
+            
+            target_site = target_parts[0] if len(target_parts) > 0 else ''
+            target_sec = target_parts[1] if len(target_parts) > 1 else ''
+            target_bnd = target_parts[2] if len(target_parts) > 2 else issue['sector2'].get('band', '')
+            
             feat.setAttributes([
-                issue['type'],
-                issue['severity'],
-                source_id,
-                target_id,
-                issue['distance_km'],
-                details
+                issue['type'],                            # type
+                issue['severity'],                        # severity
+                source_id,                                # source_sector
+                source_site,                              # source_site_id
+                source_sec,                               # source_sector_id
+                source_bnd,                               # source_band
+                target_id,                                # target_sector
+                target_site,                              # target_site_id
+                target_sec,                               # target_sector_id
+                target_bnd,                               # target_band
+                issue['distance_km'],                     # distance_km
+                details                                   # details
             ])
             features.append(feat)
         
