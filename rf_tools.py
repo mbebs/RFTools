@@ -39,10 +39,6 @@ from .tilt_optimizer_dialog import TiltOptimizerDialog
 from .azimuth_optimizer_dialog import AzimuthOptimizerDialog
 from .coverage_prediction_dialog import CoveragePredictionDialog
 from .interference_analysis_dialog import InterferenceAnalysisDialog
-from .vendor_import_dialog import VendorImportDialog
-from .database_connector_dialog import DatabaseConnectorDialog
-from .drive_test_dialog import DriveTestDialog
-from .performance_dashboard_dialog import PerformanceDashboardDialog
 from .about_dialog import AboutRFToolsDialog
 import os.path
 
@@ -265,50 +261,6 @@ class RFTools:
         self.toolbar.addAction(interference_action)
         self.iface.addPluginToMenu(self.menu, interference_action)
         self.actions.append(interference_action)
-
-        # Vendor Import/Export icon
-        vendor_icon_path = os.path.join(self.plugin_dir, 'icon_vendor.svg')
-        if not os.path.exists(vendor_icon_path):
-            vendor_icon_path = default_icon_path
-        vendor_icon = QIcon(vendor_icon_path)
-        vendor_action = QAction(vendor_icon, self.tr(u'Vendor Import/Export'), self.iface.mainWindow())
-        vendor_action.triggered.connect(self.run_vendor_import)
-        self.toolbar.addAction(vendor_action)
-        self.iface.addPluginToMenu(self.menu, vendor_action)
-        self.actions.append(vendor_action)
-
-        # Database Connector icon
-        database_icon_path = os.path.join(self.plugin_dir, 'icon_database.svg')
-        if not os.path.exists(database_icon_path):
-            database_icon_path = default_icon_path
-        database_icon = QIcon(database_icon_path)
-        database_action = QAction(database_icon, self.tr(u'Database Connector'), self.iface.mainWindow())
-        database_action.triggered.connect(self.run_database_connector)
-        self.toolbar.addAction(database_action)
-        self.iface.addPluginToMenu(self.menu, database_action)
-        self.actions.append(database_action)
-
-        # Drive Test Import/Analysis icon
-        drivetest_icon_path = os.path.join(self.plugin_dir, 'icon_drivetest.svg')
-        if not os.path.exists(drivetest_icon_path):
-            drivetest_icon_path = default_icon_path
-        drivetest_icon = QIcon(drivetest_icon_path)
-        drivetest_action = QAction(drivetest_icon, self.tr(u'Drive Test Import/Analysis'), self.iface.mainWindow())
-        drivetest_action.triggered.connect(self.run_drive_test)
-        self.toolbar.addAction(drivetest_action)
-        self.iface.addPluginToMenu(self.menu, drivetest_action)
-        self.actions.append(drivetest_action)
-
-        # Performance Dashboard icon
-        dashboard_icon_path = os.path.join(self.plugin_dir, 'icon_dashboard.svg')
-        if not os.path.exists(dashboard_icon_path):
-            dashboard_icon_path = default_icon_path
-        dashboard_icon = QIcon(dashboard_icon_path)
-        dashboard_action = QAction(dashboard_icon, self.tr(u'Network Performance Dashboard'), self.iface.mainWindow())
-        dashboard_action.triggered.connect(self.run_performance_dashboard)
-        self.toolbar.addAction(dashboard_action)
-        self.iface.addPluginToMenu(self.menu, dashboard_action)
-        self.actions.append(dashboard_action)
 
         # About RF Tools icon (orange)
         about_icon_path = os.path.join(self.plugin_dir, 'icon_about.svg')
